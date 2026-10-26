@@ -21,7 +21,7 @@ int src_data_length, const uint8_t key[], int key_length){
     *dst_data_length = total_length;
     *dst = (unsigned char*)malloc(total_length);
     if (*dst == NULL) {
-        fprintf(stderr, "problemem d'alocation.\n");
+        fprintf(stderr, "Erreur d'allocation mémoire.\n");
         return -1;
     }
     memcpy(*dst, src, src_data_length);
@@ -46,7 +46,7 @@ int src_data_length, const uint8_t key[], int key_length){
 int aes_ecb_decrypt(unsigned char** dst, int *dst_data_length, const unsigned char* src,
 int src_data_length, const uint8_t key[], int key_length){
     if (src_data_length % 16 != 0) {
-        fprintf(stderr, "houston on a un problele ca doit etre un multiple de 16!\n");
+        fprintf(stderr, "Erreur : la taille des données chiffrées doit être un multiple de 16 octets.\n");
         return -1;
     }
     *dst = (unsigned char*)malloc(src_data_length);
@@ -89,7 +89,7 @@ int aes_cbc_encrypt(unsigned char** dst, int *dst_data_length, const unsigned ch
     *dst_data_length = total_length;
     *dst = (unsigned char*)malloc(total_length);
     if (*dst == NULL) {
-        fprintf(stderr, "problemem d'alocation.\n");
+        fprintf(stderr, "Erreur d'allocation mémoire.\n");
         return -1;
     }
     memcpy(*dst, src, src_data_length);
@@ -115,7 +115,7 @@ int aes_cbc_encrypt(unsigned char** dst, int *dst_data_length, const unsigned ch
 int aes_cbc_decrypt(unsigned char** dst, int *dst_data_length, const unsigned char* src,
                     int src_data_length, const unsigned char* iv, const uint8_t key[], int key_length) {
     if (src_data_length % 16 != 0) {
-        fprintf(stderr, "houston on a un problele ca doit etre un multiple de 16!\n");
+        fprintf(stderr, "Erreur : la taille des données chiffrées doit être un multiple de 16 octets.\n");
         return -1;
     }
     *dst = (unsigned char*)malloc(src_data_length);
@@ -157,20 +157,23 @@ int aes_fichier(char clee_hex[], int longueur_clee, int mode_cbc, unsigned char 
     cle_hex_vers_tableau(clee_hex, clee);
     char fichier_entree[256];
     char fichier_sortie[256];
-    printf("Entrez le nom du fichier d'entree : ");
-    scanf("%255s", fichier_entree);
-    printf("Entrez le nom du fichier de sortie : ");
-    scanf("%255s", fichier_sortie);
+    printf("Nom du fichier d'entrée : ");
+    if (scanf("%255s", fichier_entree) != 1) { fprintf(stderr, "Saisie invalide.\n"); return -1; }
+    printf("Nom du fichier de sortie : ");
+    if (scanf("%255s", fichier_sortie) != 1) { fprintf(stderr, "Saisie invalide.\n"); return -1; }
     FILE* fichier = NULL;
     FILE* fichier_s  = NULL;
     long length = 0;      
     fichier = fopen(fichier_entree, "rb");
     if (fichier == NULL) {
         perror("Erreur lors de l'ouverture du fichier source");
+        return -1;
     }
     fichier_s = fopen(fichier_sortie, "wb");
     if (fichier_s == NULL) {
         perror("Erreur lors de l'ouverture du fichier de sortie");
+        fclose(fichier);
+        return -1;
     }
     fseek(fichier, 0, SEEK_END);
     length = ftell(fichier);
@@ -186,8 +189,8 @@ int aes_fichier(char clee_hex[], int longueur_clee, int mode_cbc, unsigned char 
     unsigned char* message_chiffre = NULL;
     int longueur_message_chiffre;
     int mode;
-    printf("Entrez le mode (1 pour chiffrer, 2 pour dechiffrer) : ");
-    scanf("%d", &mode);
+    printf("Mode (1 = chiffrer, 2 = déchiffrer) : ");
+    if (scanf("%d", &mode) != 1) mode = 0;
     clock_t debut = clock();
     if (mode == 1) {
         if (mode_cbc) {
@@ -211,7 +214,7 @@ int aes_fichier(char clee_hex[], int longueur_clee, int mode_cbc, unsigned char 
     clock_t fin = clock();
     double duree_ms = (double)(fin - debut) / CLOCKS_PER_SEC * 1000.0;
     double debit_mbs = (double)octet_lu / (1024.0 * 1024.0) / ((double)(fin - debut) / CLOCKS_PER_SEC);
-    printf("Temps : %.3f ms | Debit : %.2f MB/s | %d octets traites\n",
+    printf("Temps : %.3f ms | Débit : %.2f Mo/s | %d octets traités\n",
            duree_ms, debit_mbs, octet_lu);
 
     fwrite(message_chiffre, 1, longueur_message_chiffre, fichier_s);

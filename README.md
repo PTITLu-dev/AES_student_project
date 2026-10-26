@@ -35,26 +35,26 @@ Ce projet étant un livrable académique avec une contrainte de temps, certains 
 
 ## 🛠️ Compilation et Exécution
 
-**Prérequis :** Un processeur supportant AES-NI et GCC avec support OpenMP.
+**Prérequis :** Linux, `gcc` avec OpenMP, `make`, et un processeur x86-64 avec les instructions AES-NI (option 5 et images en ECB).
 
 ```bash
-# Compiler le projet
-make
-
-# Lancer l'outil interactif
-./aes
+make            # construit ./aes (outil interactif) et ./test_aes
+make test       # vérifie le chiffrement sur les vecteurs officiels FIPS-197
+./aes           # menu : bloc, fichier, texte de démonstration, image BMP, test de performance
+make clean
 ```
 
+La clé utilisée par l'outil est la clé de test AES-256 du standard FIPS-197
+(`000102…1e1f`), codée en dur dans `main.c` pour la démonstration.
+
 ## 📂 Structure du code
-aes_encrypt.c / aes_decrypt.c : Algorithme AES logiciel (implémentation mathématique standard).
 
-aes_ni.c : Version optimisée utilisant les intrinsics SIMD Intel (wmmintrin.h).
-
-fichier.c : Logique de gestion des fichiers (I/O) et d'application des modes.
-
-photo.c & bmp.c : Traitement spécifique des images BMP et calcul de l'entropie.
-
-fonctions.c : Outils cryptographiques (Mathématiques de Galois, Key Expansion).
+- `aes_encrypt.c` / `aes_decrypt.c` : AES logiciel (SubBytes, ShiftRows, MixColumns, AddRoundKey)
+- `fonctions.c` : outils communs (arithmétique dans GF(2⁸), expansion de clé)
+- `aes_ni.c` : version accélérée avec les instructions AES-NI (`wmmintrin.h`) et OpenMP
+- `fichier.c` : chiffrement de fichiers, modes ECB et CBC, bourrage PKCS#7
+- `photo.c` / `bmp.c` : chiffrement des pixels d'une image BMP et calcul de l'entropie
+- `main.c` : menu interactif ; `test.c` : tests sur les vecteurs FIPS-197
 
 ## 👥 Auteurs
 - PETIT Lucas

@@ -48,7 +48,7 @@ int aes_ni_key_expansion(const uint8_t key[], int key_length_bytes, aes_ni_sched
         sched->nr = 14;
         expand_256(key, sched->enc);
     } else {
-        fprintf(stderr, "AES-NI : seulement AES-256 (32 octets) supporte.\n");
+        fprintf(stderr, "AES-NI : seulement AES-256 (32 octets) supporté.\n");
         return -1;
     }
     int nr = sched->nr;

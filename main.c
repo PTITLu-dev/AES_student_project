@@ -16,23 +16,23 @@ int main_chaine( char clee_hex[], int taille_cle){
     state state_utilisateur;
     state state_code;
     uint8_t clee[32];
-    printf("rentre le text que tu veux creer que tu veux?\n");
+    printf("Entrez un bloc de 16 octets en hexadécimal (32 caractères) :\n");
     char texte_hex[33];
-    scanf("%32s", texte_hex);
+    if (scanf("%32s", texte_hex) != 1) { fprintf(stderr, "Saisie invalide.\n"); return 1; }
     texte_hex_vers_state(texte_hex, state_utilisateur);
     cle_hex_vers_tableau(clee_hex, clee);
-    printf("crypter (1) oiu decrypter (2) ?\n");
+    printf("Chiffrer (1) ou déchiffrer (2) ?\n");
     int choix;
-    scanf("%d", &choix);
+    if (scanf("%d", &choix) != 1) { fprintf(stderr, "Saisie invalide.\n"); return 1; }
         if (choix == 1) {
             aes_encrypt(state_code, state_utilisateur, clee, calculNr(taille_cle));
         } else if (choix == 2) {
             aes_decrypt( state_code, state_utilisateur, clee, calculNr(taille_cle));
         } else {
-            printf("heu pas encore coder seuluement 1 ou 2!!.\n");
+            printf("Choix invalide : 1 ou 2.\n");
             return 1;
         }
-        printf("le resultat est : \n");
+        printf("Résultat :\n");
             print_state(state_code);
 
     return 0;
@@ -46,12 +46,12 @@ int main_long_chaine(char clee_hex[], int taille_cle){
     uint8_t clee[32];
     unsigned char *char_resultat = NULL;
     int taille_cle_resultat;
-    printf("voila le texte quon va utiliser avec le mode ECB :\n");
+    printf("Texte de démonstration (mode ECB) :\n");
     printf("%s\n", char_test);
     cle_hex_vers_tableau(clee_hex, clee);
-    printf("crypter (1) oiu decrypter (2) ?\n");
+    printf("Chiffrer (1) ou déchiffrer (2) ?\n");
     int choix;
-    scanf("%d", &choix);
+    if (scanf("%d", &choix) != 1) { fprintf(stderr, "Saisie invalide.\n"); return 1; }
         if (choix == 1) {
             aes_ecb_encrypt( &char_resultat, &taille_cle_resultat, (unsigned char*)char_test, (int)strlen(char_test), clee, calculNr(taille_cle));
         } else if (choix == 2) {
@@ -62,15 +62,15 @@ int main_long_chaine(char clee_hex[], int taille_cle){
             free(char_chiffre);
         }
         else {
-            printf("heu pas encore coder seuluement 1 ou 2!!.\n");
+            printf("Choix invalide : 1 ou 2.\n");
             return 1;
         }
-        printf("le resultat est (en hexa) : \n");
+        printf("Résultat (hexadécimal) :\n");
         for (int i = 0; i < taille_cle_resultat; i++) {
             printf("%02x", char_resultat[i]);
 
         }
-        printf("\nle resultat est (en clair) : \n");
+        printf("\nRésultat (texte) :\n");
         for (int i = 0; i < taille_cle_resultat; i++) {
             printf("%c", char_resultat[i]);
         }
@@ -84,13 +84,13 @@ int main_long_chaine(char clee_hex[], int taille_cle){
 
 
 static void test(const char *clee_hex, int taille_clee) {
-    printf("Taille du buffer a tester en MB (ex: 500) : ");
+    printf("Taille du tampon à tester en Mo (ex : 500) : ");
     int taille_mb;
-    scanf("%d", &taille_mb);
+    if (scanf("%d", &taille_mb) != 1 || taille_mb <= 0 || taille_mb > 2047) { fprintf(stderr, "Taille invalide (1 à 2047 Mo).\n"); return; }
 
     int taille = taille_mb * 1024 * 1024;
     unsigned char *data = (unsigned char*)malloc(taille);
-    if (!data) { fprintf(stderr, "Allocation echouee.\n"); return; }
+    if (!data) { fprintf(stderr, "Allocation échouée.\n"); return; }
 
     // Remplissage avec des donnees pseudo-aleatoires
     for (int i = 0; i < taille; i++) data[i] = (unsigned char)(i ^ (i >> 8) ^ 0xA5);
@@ -114,13 +114,13 @@ static void test(const char *clee_hex, int taille_clee) {
 int main() {
     char clee_hex[65]="000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f";
     int taille_clee = (int)(strlen(clee_hex) / 2);
-    printf("Que veux tu faire ?\n1. Chiffrer/Dechiffrer une chaine de caractere\n2. Chiffrer/Dechiffrer un fichier\n3. Chiffrer/Dechiffrer un texte long\n4. Chiffrer/Dechiffrer une image\n5. Test de performance\n");
+    printf("Que voulez-vous faire ?\n1. Chiffrer/déchiffrer un bloc (hexadécimal)\n2. Chiffrer/déchiffrer un fichier\n3. Chiffrer/déchiffrer un texte de démonstration\n4. Chiffrer/déchiffrer une image BMP\n5. Test de performance (AES-NI + OpenMP)\n");
     int choix;
-    scanf("%d", &choix);
+    if (scanf("%d", &choix) != 1) { fprintf(stderr, "Saisie invalide.\n"); return 1; }
     int mode_cbc = 0;
     if (choix != 5) {
-        printf("tu veux utiliser le mode CBC ? (1 pour oui, 0 pour non)\n");
-        scanf("%d", &mode_cbc);
+        printf("Utiliser le mode CBC ? (1 = oui, 0 = non, ECB)\n");
+        if (scanf("%d", &mode_cbc) != 1) { fprintf(stderr, "Saisie invalide.\n"); return 1; }
     }
     unsigned char iv[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     if (choix == 1) {
@@ -135,7 +135,7 @@ int main() {
         test(clee_hex, taille_clee);
         return 0;
     } else {
-        printf("heu pas encore code seulement 1 a 5 !!.\n");
+        printf("Choix invalide : 1 à 5.\n");
         return 1;
     }
     return 0;

@@ -36,7 +36,7 @@ int nkValue(int nr){
     if (nr ==10) {return 4;}
     if (nr==12)  {return 6;}
     if(nr==14)   {return 8;}
-    else printf("probleme taille clé\n");
+    else fprintf(stderr, "Nombre de tours invalide.\n");
     return 0;
 }
 
@@ -49,7 +49,7 @@ int calculNr(int key_length) {
     } else if (key_length == 32) {
         return 14; 
     } else {
-        printf("taille de cle bizare.\n");
+        fprintf(stderr, "Taille de clé invalide : 16, 24 ou 32 octets attendus.\n");
         return -1; 
     }
 }

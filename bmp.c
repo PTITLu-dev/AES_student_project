@@ -184,14 +184,14 @@ bmp_write(char *fname, bmp_image *img)
   int_to_bytes((unsigned char*) img -> header -> data+2, img -> header -> size + img -> pixels -> size);
 
   r = fwrite(img -> header -> data, 1, img -> header -> size, f);
-  if (r != img -> header -> size)
+  if ((unsigned int) r != img -> header -> size)
   {
     perror("bmp_write, fwrite(), header");
     exit(8);
   }
 
   r = fwrite(img -> pixels -> data, 1, img -> pixels -> size, f);
-  if (r != img -> pixels -> size)
+  if ((unsigned int) r != img -> pixels -> size)
   {
     perror("bmp_write, fwrite(), pixels");
     exit(9);

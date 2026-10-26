@@ -28,20 +28,20 @@ double entropie(const unsigned char* data, int taille) {
 int photo(char clee_hex[], int longueur_clee, int mode_cbc, unsigned char iv[16]) {
     bmp_image *img, *img2;
     chunk *h, *h2, *p, *p2;
-    printf("Quelle image voulez vous chiffrer ?\n");
+    printf("Image BMP d'entrée :\n");
     char image[256];
-    scanf("%255s", image);
-    printf("Quelle image voulez vous sortir ?\n");
+    if (scanf("%255s", image) != 1) { fprintf(stderr, "Saisie invalide.\n"); return 1; }
+    printf("Image BMP de sortie :\n");
     char image_sortie[256];
-    scanf("%255s", image_sortie);
+    if (scanf("%255s", image_sortie) != 1) { fprintf(stderr, "Saisie invalide.\n"); return 1; }
     img = bmp_read(image);
     h = bmp_get_header(img);
     p = bmp_get_pixels(img);
     printf("Entropie image source      : %.4f bits/octet\n",
            entropie((const unsigned char*)chunk_get_data(p), chunk_get_size(p)));
-    printf("Veux tu cryper (1) ou decrypter (2) ?\n");
+    printf("Chiffrer (1) ou déchiffrer (2) ?\n");
     int mode;
-    scanf("%d", &mode);
+    if (scanf("%d", &mode) != 1) mode = 0;
     if (mode == 1) {
         unsigned char* pixels_chiffres = NULL;
         int taille_pixels_chiffres;
@@ -114,7 +114,7 @@ int photo(char clee_hex[], int longueur_clee, int mode_cbc, unsigned char iv[16]
         h2 = chunk_copy(h);
         img2 = bmp_create(h2, p2);
     } else {
-        printf("heu pas encore code seulement 1 ou 2 !!.\n");
+        printf("Choix invalide : 1 ou 2.\n");
         return 1;
     }
     bmp_free(img);
